@@ -39,7 +39,7 @@ public class FacultyController {
     }
 
     @GetMapping("/{facultyId}/students")
-    @Operation(summary = "")
+    @Operation(summary = "Инфо о студентах факультета")
     public Collection<Student> getStudentsByFacultyId(@PathVariable Long facultyId) {
        return facultyService.getStudentsByFacultyId(facultyId);
     }
@@ -77,12 +77,15 @@ public class FacultyController {
 
     }
 
-    @GetMapping("byColor")
+    @GetMapping("/byColorOrName")
     @Operation(summary = "Сортировка по цвету или имени")
     public ResponseEntity<Collection<Faculty>> findFaculties(@RequestParam(required = false) String color,
-                                                             @RequestParam(required = false) String name) {
+                                                             @RequestParam(required = false) String nameFaculty) {
         if (color != null && !color.isBlank()) {
-            return ResponseEntity.ok(facultyService.findByColorOrName(color,name));
+            return ResponseEntity.ok(facultyService.findAllbyColorIgnoreCase(color));
+        }
+        if (nameFaculty != null && !nameFaculty.isBlank()) {
+            return ResponseEntity.ok(facultyService.findAllbyNameIgnoreCase(nameFaculty));
         }
         return ResponseEntity.ok(Collections.emptyList());
     }

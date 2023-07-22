@@ -92,6 +92,7 @@ public class StudentController {
         return ResponseEntity.ok(Collections.emptyList());
     }
     @GetMapping("/byFaculty")
+    @Operation(summary = "Поиск студентов по Id факультета")
     public Collection<Student> findStudentByFaculty(@RequestParam long faculId){
         return studentService.findStudentByFaculty(faculId);
     }
