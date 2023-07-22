@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.StudentService;
 
@@ -22,19 +23,32 @@ public class StudentController {
         this.studentService = studentService;
     }
     @GetMapping("all")
-    @Operation(summary = "Информация о всех студентах")
-    public ResponseEntity<Collection<Student>> getAllStudents(){
+    @Operation(summary = "Информация о всех студентах,по имени,по части имени")
+    public ResponseEntity findStudents(@RequestParam(required = false) String name){
+
+        if(name != null && !name.isBlank()){
+            return ResponseEntity.ok(studentService.findByNameContainingIgnoreCase(name));
+        }
         return ResponseEntity.ok(studentService.getAllStudent());
     }
 
     @GetMapping("{id}")
-    @Operation(summary = "Информация о студенте")
+    @Operation(summary = "Информация о студенте по id")
     public ResponseEntity<Student> getStudentInfo(@PathVariable Long id) {
-        Student student = studentService.findStudent(id);
+        Student student = studentService.findStudentById(id);
         if (student == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(student);
+    }
+    @GetMapping("{studentId}/faculty")
+    @Operation(summary = "Получение факультета студента по его ID")
+    public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long studentId) {
+        Student student = studentService.findStudentById(studentId);
+        if (student == null || student.getFaculty() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(student.getFaculty());
     }
 
     @PostMapping
@@ -59,12 +73,26 @@ public class StudentController {
         studentService.deleteStudent(id);
         return ResponseEntity.ok().build();
     }
-    @GetMapping
+    @GetMapping("age")
     @Operation(summary = "Поиск студентов(а) по возрасту")
-    public ResponseEntity<Collection<Student>> findStudents(@RequestParam(required = false) int age) {
+    public ResponseEntity<Collection<Student>> findStudents(@RequestParam int age) {
         if (age > 0) {
             return ResponseEntity.ok(studentService.findByAge(age));
         }
         return ResponseEntity.ok(Collections.emptyList());
+    }
+
+    @GetMapping("/byAgeBetween")
+    @Operation(summary = "Поиск студентов по возрасту в диапазоне между min и max")
+    public ResponseEntity<Collection<Student>> findStudentsByAgeBetween(@RequestParam int minAge,
+                                                                        @RequestParam int maxAge) {
+        if (minAge > 0) {
+            return ResponseEntity.ok(studentService.findByAgeBetween(minAge,maxAge));
+        }
+        return ResponseEntity.ok(Collections.emptyList());
+    }
+    @GetMapping("/byFaculty")
+    public Collection<Student> findStudentByFaculty(@RequestParam long faculId){
+        return studentService.findStudentByFaculty(faculId);
     }
 }

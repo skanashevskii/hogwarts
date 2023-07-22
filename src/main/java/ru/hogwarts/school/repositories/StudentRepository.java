@@ -10,7 +10,9 @@ import java.util.List;
 
 @Repository
 public interface StudentRepository extends JpaRepository<Student,Long> {
-    List<Student> findByName(String studentName);
 
+    Collection<Student> findByNameContainingIgnoreCase(String name);
+    Collection<Student> findByAgeBetween(int minAge,int maxAge);
     Collection<Student> findByAge(int age);
+    Collection<Student> findAllByFaculty_Id(long facultyId);
 }

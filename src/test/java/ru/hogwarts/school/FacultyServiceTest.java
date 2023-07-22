@@ -60,18 +60,19 @@ class FacultyServiceTest {
     }
 
     @Test
-    void testFindByName() {
+    void testFindByNameOrColor() {
 
         String facultyName = "Some Faculty";
+        String color = "Some Faculty";
         List<Faculty> faculties = new ArrayList<>();
-        when(facultyRepository.findByName(facultyName)).thenReturn(faculties);
+        when(facultyRepository.findAllByColorOrNameIgnoreCase(color,facultyName)).thenReturn(faculties);
 
 
-        List<Faculty> result = facultyService.findByName(facultyName);
+        Collection<Faculty> result = facultyService.findByColorOrName(color,facultyName);
 
 
         assertEquals(faculties, result);
-        verify(facultyRepository, times(1)).findByName(facultyName);
+        verify(facultyRepository, times(1)).findAllByColorOrNameIgnoreCase(color,facultyName);
     }
 
     @Test
@@ -100,19 +101,6 @@ class FacultyServiceTest {
         verify(facultyRepository, times(1)).deleteById(facultyId);
     }
 
-    @Test
-    void testFindByColor() {
 
-        String color = "blue";
-        List<Faculty> faculties = new ArrayList<>();
-        when(facultyRepository.findByColor(color)).thenReturn(faculties);
-
-
-        Collection<Faculty> result = facultyService.findByColor(color);
-
-
-        assertEquals(faculties, result);
-
-    }
 }
 

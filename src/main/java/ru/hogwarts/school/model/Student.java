@@ -1,5 +1,6 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -24,6 +25,11 @@ public class Student {
     @Min(1)
     private int age;
 
+    @ManyToOne
+    @JoinColumn(name = "faculty_id")
+    @JsonIgnore
+    private Faculty faculty;
+
     public Student(Long id, String name, int age) {
         this.id = id;
         this.name = name;
@@ -31,6 +37,10 @@ public class Student {
     }
 
     public Student() {
+    }
+
+    public void setFaculty(Faculty faculty) {
+        this.faculty = faculty;
     }
 
     public Long getId() {
@@ -57,16 +67,21 @@ public class Student {
         this.age = age;
     }
 
+    public Faculty getFaculty() {
+        return faculty;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Student student = (Student) o;
-        return age == student.age && Objects.equals(id, student.id) && Objects.equals(name, student.name);
+        return Objects.equals(id, student.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, age);
+        return Objects.hash(id);
     }
 }

@@ -11,45 +11,59 @@ import java.util.List;
 
 @Service
 public class StudentService {
-    //private final Map<Long, Student> studentHogwarts = new HashMap<>();
-    //private long lastId = 0;
-    private StudentRepository studentRepository;
+    private final StudentRepository studentRepository;
 
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
-    /*   public Student createStudent(Student student) {
-           student.setId(++lastId);
-           studentHogwarts.put(lastId, student);
-           return student;
-       }*/
-    public Student createStudent(Student student){
+    public Student createStudent(Student student) {
         return studentRepository.save(student);
     }
 
-
-    public Student findStudent(long id) {
-        return studentRepository.findById(id).get();
+    public Student findStudentById(long id) {
+        return studentRepository.findById(id).orElse(null);
     }
-    public List<Student> findByName(String studentName) {
-        return studentRepository.findByName(studentName);
+
+    public Collection<Student> findByNameContainingIgnoreCase(String name) {
+        return studentRepository.findByNameContainingIgnoreCase(name);
     }
 
     public Student editStudent(Student student) {
-        return studentRepository.save(student);
+        return studentRepository.findById(student.getId())
+                .map(dbEntity -> {
+                    dbEntity.setName(student.getName());
+                    dbEntity.setAge(student.getAge());
+                    studentRepository.save(dbEntity);
+                    return dbEntity;
+                })
+                .orElse(null);
     }
 
     public void deleteStudent(long id) {
-       studentRepository.deleteById(id);
+        studentRepository.findById(id)
+                .map(entity -> {
+                    studentRepository.delete(entity);
+                    return true;
+                })
+                .orElse(false);
     }
 
     @Operation(summary = "Сортировка по возрасту")
     public Collection<Student> findByAge(int age) {
-      return studentRepository.findByAge(age);
+        return studentRepository.findByAge(age);
+    }
+
+    @Operation(summary = "Сортировка по интервалу возраста")
+    public Collection<Student> findByAgeBetween(int minAge, int maxAge) {
+        return studentRepository.findByAgeBetween(minAge, maxAge);
     }
 
     public Collection<Student> getAllStudent() {
         return studentRepository.findAll();
+    }
+
+    public Collection<Student> findStudentByFaculty(long faculId){
+        return studentRepository.findAllByFaculty_Id(faculId);
     }
 }
