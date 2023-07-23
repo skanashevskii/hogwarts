@@ -28,7 +28,7 @@ public class Faculty {
     @Column(name = "color")
     private String color;
 
-    @OneToMany(mappedBy = "faculty")
+    @OneToMany(mappedBy = "faculty",fetch = FetchType.EAGER)
     private Set<Student> students;
 
     public Faculty(Long id, String name, String color) {

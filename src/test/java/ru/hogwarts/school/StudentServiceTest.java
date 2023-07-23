@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -77,28 +78,44 @@ class StudentServiceTest {
 
     @Test
     void testEditStudent() {
+        // Arrange
+        long studentId = 1;
+        String newName = "John Doe";
+        int newAge = 25;
 
-        Student student = new Student();
-        when(studentRepository.save(any(Student.class))).thenReturn(student);
+        Student existingStudent = new Student(studentId, "Jane Smith", 22);
 
+        Student updatedStudent = new Student(studentId, newName, newAge);
 
-        Student result = studentService.editStudent(student);
+        when(studentRepository.findById(studentId)).thenReturn(java.util.Optional.of(existingStudent));
+        when(studentRepository.save(any(Student.class))).thenReturn(updatedStudent);
 
+        // Act
+        Student result = studentService.editStudent(updatedStudent);
 
-        assertEquals(student, result);
-        verify(studentRepository, times(1)).save(student);
+        // Assert
+        assertNotNull(result);
+        assertEquals(newName, result.getName());
+        assertEquals(newAge, result.getAge());
+
+        verify(studentRepository, times(1)).findById(studentId);
+        verify(studentRepository, times(1)).save(any(Student.class));
     }
 
     @Test
     void testDeleteStudent() {
-
+        // Arrange
         long studentId = 1;
+        Student existingStudent = new Student(studentId, "John Doe", 25);
 
+        when(studentRepository.findById(studentId)).thenReturn(java.util.Optional.of(existingStudent));
 
+        // Act
         studentService.deleteStudent(studentId);
 
-
-        verify(studentRepository, times(1)).deleteById(studentId);
+        // Assert
+        verify(studentRepository, times(1)).findById(studentId);
+        verify(studentRepository, times(1)).delete(existingStudent);
     }
 
     @Test

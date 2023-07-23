@@ -60,13 +60,17 @@ public class FacultyService {
 
     }
 
-    public Collection<Student> getStudentsByFacultyId(Long facultyId) {
+    public Collection<Student> getStudentsByFacultyId(long facultyId) {
+        return facultyRepository.findById(facultyId).get().getStudents();
+    }
+
+  /*  public Collection<Student> getStudentsByFacultyId(long facultyId) {
         // Находим факультет по идентификатору
-        Collection<Student> faculty = facultyRepository.getStudentsByFacultyId(facultyId);
+        Collection<Student> faculty = facultyRepository.findAllById(facultyId);
         if (faculty != null) {
             // Получаем список студентов, принадлежащих данному факультету
             return Collections.unmodifiableCollection(faculty);
         }
         return Collections.emptyList(); // Возвращаем пустой список, если факультет с таким идентификатором не найден
-    }
+    }*/
 }
