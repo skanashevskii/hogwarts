@@ -1,18 +1,25 @@
 package ru.hogwarts.school.model;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 
 @Entity
 public class Avatar {
+    @Min(1)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String filePath;//путь к файлу на диске(оригинал)
+    @Schema(description = "путь к файлу на диске(оригиналу)")
+    private String filePath;
+    @Schema(description = "размер файла")
     private long fileSize;
+    @Schema(description = "Тип файла")
     private String mediaType;
     @Lob
-    private byte[] preview;//массив байт(хранение в БД)
-    @OneToOne
+    @Schema(description = "массив байт(хранение в БД)")
+    private byte[] preview;
+    @OneToOne(fetch = FetchType.EAGER)
     private Student student;
 
     public Long getId() {
