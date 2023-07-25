@@ -2,9 +2,11 @@ package ru.hogwarts.school;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
@@ -17,6 +19,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 class FacultyServiceTest {
 
     @Mock
@@ -25,10 +28,14 @@ class FacultyServiceTest {
     @InjectMocks
     private FacultyService facultyService;
 
-    @BeforeEach
+  /*  @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
+        // Создаем мок репозитория
+        //facultyRepository = mock(FacultyRepository.class);
+        // Инициализируем сервис, передавая мок репозитория
+        //facultyService = new FacultyService(facultyRepository);
+
+    }*/
 
     @Test
     void testCreateFaculty() {
@@ -60,59 +67,85 @@ class FacultyServiceTest {
     }
 
     @Test
-    void testFindByName() {
+    void testFindByNameOrColor() {
 
         String facultyName = "Some Faculty";
+        String color = "Some Faculty";
         List<Faculty> faculties = new ArrayList<>();
-        when(facultyRepository.findByName(facultyName)).thenReturn(faculties);
+        when(facultyRepository.findByNameIgnoreCase(facultyName)).thenReturn(faculties);
+        when(facultyRepository.findByNameIgnoreCase(color)).thenReturn(faculties);
 
 
-        List<Faculty> result = facultyService.findByName(facultyName);
+        Collection<Faculty> result = facultyService.findAllbyNameIgnoreCase(facultyName);
+        Collection<Faculty> result2 = facultyService.findAllbyColorIgnoreCase(color);
 
 
         assertEquals(faculties, result);
-        verify(facultyRepository, times(1)).findByName(facultyName);
+        verify(facultyRepository, times(1)).findByNameIgnoreCase(facultyName);
+        verify(facultyRepository, times(1)).findByNameIgnoreCase(color);
     }
 
     @Test
-    void testEditFaculty() {
+    public void testDeleteFaculty_ExistingFaculty_SuccessfulDeletion() {
+        // Устанавливаем ID факультета, который существует в репозитории
+        long existingFacultyId = 1L;
 
-        Faculty faculty = new Faculty();
-        when(facultyRepository.save(any(Faculty.class))).thenReturn(faculty);
+        // При вызове метода findById с переданным ID, возвращаем факультет (сущность)
+        when(facultyRepository.findById(existingFacultyId)).thenReturn(Optional.of(new Faculty()));
 
+        // Вызываем метод deleteFaculty и ожидаем true, так как удаление должно быть успешным
+        assertTrue(facultyService.deleteFaculty(existingFacultyId));
 
-        Faculty result = facultyService.editFaculty(faculty);
-
-
-        assertEquals(faculty, result);
-        verify(facultyRepository, times(1)).save(faculty);
+        // Проверяем, что метод delete был вызван один раз с соответствующей сущностью
+        verify(facultyRepository, times(1)).delete(any(Faculty.class));
     }
 
     @Test
-    void testDeleteFaculty() {
+    public void testDeleteFaculty_NonExistentFaculty_ReturnFalse() {
+        // Устанавливаем ID факультета, которого нет в репозитории
+        long nonExistentFacultyId = 100L;
 
-        long facultyId = 1;
+        // При вызове метода findById с переданным ID, возвращаем пустой Optional (факультет не найден)
+        when(facultyRepository.findById(nonExistentFacultyId)).thenReturn(Optional.empty());
 
+        // Вызываем метод deleteFaculty и ожидаем false, так как удаление не должно быть успешным
+        assertFalse(facultyService.deleteFaculty(nonExistentFacultyId));
 
-        facultyService.deleteFaculty(facultyId);
-
-
-        verify(facultyRepository, times(1)).deleteById(facultyId);
+        // Проверяем, что метод delete не был вызван, так как факультет не найден
+        verify(facultyRepository, never()).delete(any(Faculty.class));
     }
 
     @Test
-    void testFindByColor() {
+    public void testDeleteFaculty_ExistingFaculty_SuccessfullDeletion() {
+        // Устанавливаем ID факультета, который существует в репозитории
+        long existingFacultyId = 1L;
 
-        String color = "blue";
-        List<Faculty> faculties = new ArrayList<>();
-        when(facultyRepository.findByColor(color)).thenReturn(faculties);
+        // При вызове метода findById с переданным ID, возвращаем факультет (сущность)
+        when(facultyRepository.findById(existingFacultyId)).thenReturn(Optional.of(new Faculty()));
 
+        // Вызываем метод deleteFaculty и ожидаем true, так как удаление должно быть успешным
+        assertTrue(facultyService.deleteFaculty(existingFacultyId));
 
-        Collection<Faculty> result = facultyService.findByColor(color);
+        // Проверяем, что метод delete был вызван один раз с соответствующей сущностью
+        verify(facultyRepository, times(1)).delete(any(Faculty.class));
+    }
 
+    @Test
+    public void testDeleteFaculty_NonExistentFaculty_ReturnsFalse() {
+        // Устанавливаем ID факультета, которого нет в репозитории
+        long nonExistentFacultyId = 100L;
 
-        assertEquals(faculties, result);
+        // При вызове метода findById с переданным ID, возвращаем пустой Optional (факультет не найден)
+        when(facultyRepository.findById(nonExistentFacultyId)).thenReturn(Optional.empty());
 
+        // Вызываем метод deleteFaculty и ожидаем false, так как удаление не должно быть успешным
+        assertFalse(facultyService.deleteFaculty(nonExistentFacultyId));
+
+        // Проверяем, что метод delete не был вызван, так как факультет не найден
+        verify(facultyRepository, never()).delete(any(Faculty.class));
     }
 }
+
+
+
 

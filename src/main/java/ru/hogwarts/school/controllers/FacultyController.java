@@ -7,7 +7,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
+
+import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.service.FacultyService;
+
 
 import java.util.Collection;
 import java.util.Collections;
@@ -26,13 +29,30 @@ public class FacultyController {
 
     @GetMapping("{id}")
     @Operation(summary = "Информация о факультете")
-    public ResponseEntity<Faculty> getFacultyInfo(@Parameter(description = "ID факультета") @PathVariable long id) {
+    public ResponseEntity<Faculty> getFacultyInfo(@Parameter(description = "ID факультета")
+                                                  @PathVariable long id) {
         Faculty faculty = facultyService.findFacultyById(id);
         if (faculty == null) {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(faculty);
     }
+
+    @GetMapping("/{facultyId}/students")
+    @Operation(summary = "Инфо о студентах факультета")
+    public Collection<Student> getStudentsByFacultyId(@PathVariable long facultyId) {
+       return facultyService.getStudentsByFacultyId(facultyId);
+
+    }
+/*    @GetMapping("/{facultyId}/students")
+    @Operation(summary = "Получение студентов факультета по его ID")
+    public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@PathVariable Long facultyId) {
+        Collection<Student> students = facultyService.getStudentsByFacultyId(facultyId);
+        if (!students.isEmpty()) {
+            return ResponseEntity.ok(students);
+        }
+        return ResponseEntity.notFound().build();
+    }*/
 
     @PostMapping
     @Operation(summary = "Создание факультета")
@@ -58,17 +78,17 @@ public class FacultyController {
 
     }
 
-    @GetMapping("byColor")
-    @Operation(summary = "Сортировка по цвету")
-    public ResponseEntity<Collection<Faculty>> findFaculties(@RequestParam(required = false) String color) {
+    @GetMapping("/byColorOrName")
+    @Operation(summary = "Сортировка по цвету или имени")
+    public ResponseEntity<Collection<Faculty>> findFaculties(@RequestParam(required = false) String color,
+                                                             @RequestParam(required = false) String nameFaculty) {
         if (color != null && !color.isBlank()) {
-            return ResponseEntity.ok(facultyService.findByColor(color));
+            return ResponseEntity.ok(facultyService.findAllbyColorIgnoreCase(color));
+        }
+        if (nameFaculty != null && !nameFaculty.isBlank()) {
+            return ResponseEntity.ok(facultyService.findAllbyNameIgnoreCase(nameFaculty));
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
-    //2 й вариант
- /*   public Collection<Faculty> findFaculties(@RequestParam String color) {
 
-        return facultyService.findByColor(color);
-    }*/
 }
