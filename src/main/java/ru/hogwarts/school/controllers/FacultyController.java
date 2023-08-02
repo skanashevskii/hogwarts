@@ -44,15 +44,7 @@ public class FacultyController {
        return facultyService.getStudentsByFacultyId(facultyId);
 
     }
-/*    @GetMapping("/{facultyId}/students")
-    @Operation(summary = "Получение студентов факультета по его ID")
-    public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@PathVariable Long facultyId) {
-        Collection<Student> students = facultyService.getStudentsByFacultyId(facultyId);
-        if (!students.isEmpty()) {
-            return ResponseEntity.ok(students);
-        }
-        return ResponseEntity.notFound().build();
-    }*/
+
 
     @PostMapping
     @Operation(summary = "Создание факультета")
@@ -65,7 +57,7 @@ public class FacultyController {
     public ResponseEntity<Faculty> editFaculty(@RequestBody Faculty faculty) {
         Faculty foundFaculty = facultyService.editFaculty(faculty);
         if (foundFaculty == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(foundFaculty);
     }
