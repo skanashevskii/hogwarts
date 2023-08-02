@@ -7,39 +7,34 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import ru.hogwarts.school.controllers.FacultyController;
 import ru.hogwarts.school.controllers.StudentController;
-import ru.hogwarts.school.model.Student;
+
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class HogwartsApplicationTests {
+class FacultyControllerTestRestTemplate {
     @LocalServerPort
     private int port;
     @Autowired
-    private StudentController studentController;
+    private FacultyController facultyController;
 
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Test
     public void contextLoads() throws Exception{
-        Assertions.assertThat(studentController).isNotNull();
+        Assertions.assertThat(facultyController).isNotNull();
     }
     @Test
-    public void findStudents() throws Exception{
+    public void findFacultiesAll() throws Exception{
         Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:"+port+"/student/all",String.class))
+                .assertThat(this.restTemplate.getForObject("http://localhost:"+port+"/faculty/all",String.class))
                 .isNotNull();
     }
     @Test
-    public void findStudentById() throws Exception{
+    public void findFacultyById() throws Exception{
         Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:"+port+"/student/1",String.class))
-                .isNotNull();
-    }
-    @Test
-    public void findStudentsByIdFaculty() throws Exception{
-        Assertions
-                .assertThat(this.restTemplate.getForObject("http://localhost:"+port+"/student/2/faculty",Object.class))
+                .assertThat(this.restTemplate.getForObject("http://localhost:"+port+"/faculty/1",String.class))
                 .isNotNull();
     }
 
