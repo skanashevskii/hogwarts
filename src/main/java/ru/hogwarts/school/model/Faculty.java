@@ -1,5 +1,6 @@
 package ru.hogwarts.school.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
@@ -24,7 +25,6 @@ public class Faculty {
     @Column(name = "name")
     private String name;
     @Schema(description = "Цвет факультета")
-    @NotBlank//не пустая строка
     @Column(name = "color")
     private String color;
 
@@ -71,6 +71,7 @@ public class Faculty {
     public void setStudents(Set<Student> students) {
         this.students = students;
     }
+
 
 
     @Override
