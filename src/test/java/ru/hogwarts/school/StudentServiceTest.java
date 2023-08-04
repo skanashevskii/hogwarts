@@ -38,9 +38,7 @@ class StudentServiceTest {
         Student student = new Student();
         when(studentRepository.save(any(Student.class))).thenReturn(student);
 
-
         Student result = studentService.createStudent(student);
-
 
         assertEquals(student, result);
         verify(studentRepository, times(1)).save(student);
@@ -53,28 +51,12 @@ class StudentServiceTest {
         Student student = new Student();
         when(studentRepository.findById(studentId)).thenReturn(Optional.of(student));
 
-
         Student result = studentService.findStudentById(studentId);
-
 
         assertEquals(student, result);
         verify(studentRepository, times(1)).findById(studentId);
     }
 
-  /*  @Test
-    void testFindByName() {
-
-        String studentName = "John Doe";
-        List<Student> students = new ArrayList<>();
-        //when(studentRepository.findByName(studentName)).thenReturn(students));
-
-
-        Student result = studentService.findByName(studentName);
-
-
-        assertEquals(students, result);
-        verify(studentRepository, times(1)).findByName(studentName);
-    }*/
 
     @Test
     void testEditStudent() {
@@ -125,9 +107,7 @@ class StudentServiceTest {
         List<Student> students = new ArrayList<>();
         when(studentRepository.findByAge(age)).thenReturn(students);
 
-
         Collection<Student> result = studentService.findByAge(age);
-
 
         assertEquals(students, result);
         verify(studentRepository, times(1)).findByAge(age);
@@ -139,9 +119,7 @@ class StudentServiceTest {
         List<Student> students = new ArrayList<>();
         when(studentRepository.findAll()).thenReturn(students);
 
-
         Collection<Student> result = studentService.getAllStudent();
-
 
         assertEquals(students, result);
         verify(studentRepository, times(1)).findAll();

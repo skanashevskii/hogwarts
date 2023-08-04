@@ -1,8 +1,11 @@
 package ru.hogwarts.school.service;
 
 import io.swagger.v3.oas.annotations.Operation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import ru.hogwarts.school.controllers.StudentController;
 import ru.hogwarts.school.dto.StudentDTO;
 import ru.hogwarts.school.dto.StudentMapper;
 import ru.hogwarts.school.model.Student;
@@ -14,6 +17,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class StudentService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
     private final StudentRepository studentRepository;
 
     private StudentMapper studentMapper;
@@ -25,6 +29,7 @@ public class StudentService {
     }
 
     public Student createStudent(Student student) {
+        LOGGER.info("Editing student: {}", student);
         return studentRepository.save(student);
     }
     public StudentDTO createStudent(StudentDTO studentDTO) {
@@ -37,6 +42,7 @@ public class StudentService {
         return studentRepository.findById(id).orElse(null);
     }
     public StudentDTO findStudentById2(long id) {
+        LOGGER.info("Searching for student by ID: {}", id);
         return studentRepository.findById(id)
                 .map(studentMapper::studentEntityToStudentDTO)
                 .orElse(null);
