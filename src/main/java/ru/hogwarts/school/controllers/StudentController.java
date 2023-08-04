@@ -74,15 +74,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(student.getFaculty());
     }
- /*   @GetMapping("{studentId}/faculty/2")
-    @Operation(summary = "Получение студентов факультета по его ID")
-    public ResponseEntity<FacultyDTO> getFacultyByStudentId(@PathVariable Long studentId) {
-        StudentDTO studentDTO = studentService.findStudentById(studentId);
-        if (studentDTO == null || studentDTO.getFaculty() == null) {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-        return new ResponseEntity<>(studentDTO.getFaculty(), HttpStatus.OK);
-    }*/
+
 
     @PostMapping
     @Operation(summary = "Создание студента")

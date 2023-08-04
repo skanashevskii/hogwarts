@@ -44,15 +44,7 @@ public class FacultyController {
        return facultyService.getStudentsByFacultyId(facultyId);
 
     }
-/*    @GetMapping("/{facultyId}/students")
-    @Operation(summary = "Получение студентов факультета по его ID")
-    public ResponseEntity<Collection<Student>> getStudentsByFacultyId(@PathVariable Long facultyId) {
-        Collection<Student> students = facultyService.getStudentsByFacultyId(facultyId);
-        if (!students.isEmpty()) {
-            return ResponseEntity.ok(students);
-        }
-        return ResponseEntity.notFound().build();
-    }*/
+
 
     @PostMapping
     @Operation(summary = "Создание факультета")
@@ -90,5 +82,6 @@ public class FacultyController {
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
+
 
 }
