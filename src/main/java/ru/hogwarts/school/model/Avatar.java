@@ -22,6 +22,9 @@ public class Avatar {
     @OneToOne(fetch = FetchType.EAGER)
     private Student student;
 
+    public Avatar() {
+    }
+
     public Long getId() {
         return id;
     }

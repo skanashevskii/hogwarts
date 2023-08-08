@@ -47,6 +47,15 @@ public class StudentService {
                 .map(studentMapper::studentEntityToStudentDTO)
                 .orElse(null);
     }
+    public Integer getCountStudents(){
+        return studentRepository.getCountStudents();
+    }
+    public Integer getAvgAgeStudents(){
+        return studentRepository.getAvgAgeStudents();
+    }
+    public Collection<Student> getLastFiveStudents(){
+        return studentRepository.getLastFiveStudents();
+    }
 
     public Collection<Student> findByNameContainingIgnoreCase(String name) {
         return studentRepository.findByNameContainingIgnoreCase(name);

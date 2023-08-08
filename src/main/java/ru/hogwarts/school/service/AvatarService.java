@@ -2,12 +2,15 @@ package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import ru.hogwarts.school.model.Avatar;
 import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.AvatarRepository;
-import ru.hogwarts.school.repositories.StudentRepository;
+
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -15,6 +18,8 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+
 
 import static java.nio.file.StandardOpenOption.CREATE_NEW;
 
@@ -25,13 +30,13 @@ public class AvatarService {
     private String avatarsDir;
 
     private final AvatarRepository avatarRepository;
-    //private final StudentRepository studentRepository;
+
     private final StudentService studentService;
 
     public AvatarService(AvatarRepository avatarRepository, StudentService studentService) {
         this.avatarRepository = avatarRepository;
         this.studentService = studentService;
-        //this.studentRepository = studentRepository;
+
     }
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
@@ -78,6 +83,9 @@ public class AvatarService {
     public Avatar findAvatar(Long studentId) {
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
+    public Page<Avatar> listAvatars(Pageable pageable){
+        return avatarRepository.findAll(pageable);
+    }
 
     /**
      * generateImagePreview - создание уменьшенного изображения
@@ -86,7 +94,7 @@ public class AvatarService {
      * @return -
      * @throws IOException
      */
-    private byte[] generateImagePreview(Path filePath) throws IOException {
+    public byte[] generateImagePreview(Path filePath) throws IOException {
         try (InputStream is = Files.newInputStream(filePath);
             BufferedInputStream bis = new BufferedInputStream(is, 1024);
             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
