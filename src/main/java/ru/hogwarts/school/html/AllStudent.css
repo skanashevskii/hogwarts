@@ -1,0 +1,82 @@
+
+body {
+    font-family: Arial, sans-serif;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+th, td {
+    padding: 8px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+th {
+    background-color: #f2f2f2;
+}
+tr:hover {
+    background-color: #f2f2f2;
+}
+/* Style the fixed navigation bar */
+.navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #333;
+    display: flex;
+    justify-content: space-around;
+}
+
+/* Style the menu buttons */
+.menu-btn {
+    background-color: transparent;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* Style the modal dialogs (hidden by default) */
+.modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background-color: #f9f9f9;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 20px;
+    max-width: 400px;
+}
+/* Center modal content horizontally */
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Add some spacing between elements in the modal */
+.modal-content > * {
+    margin-bottom: 10px;
+}
+/* Adjust button style for the "Создать студента" button */
+.modal-content button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+.modal-content button:hover {
+    background-color: #45a049;
+}
+
+/* Show the modal dialog when it's active */
+.modal.active {
+    display: block;
+}
+/* Добавляем прокрутку для списка (или таблицы) */
+.scrollable-list {
+    max-height: 300px; /* Определите максимальную высоту, чтобы установить, когда показывать полосу прокрутки */
+    overflow: auto;
+}

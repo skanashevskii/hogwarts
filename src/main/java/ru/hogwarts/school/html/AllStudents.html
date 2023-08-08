@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Список студентов</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="AllStudent.css" rel="stylesheet">
+
+</head>
+<body>
+<div class="navbar">
+    <button class="menu-btn" onclick="showStudentListQuery()">Список студентов</button>
+    <button class="menu-btn" onclick="showSearchStudentQuery()">Поиск студента</button>
+    <button class="menu-btn" onclick="showCreateStudentQuery()">Создание студента</button>
+</div>
+<table class="studentsTable">
+    <!-- Здесь будут отображаться данные студентов -->
+</table>
+
+<!-- Add a container element with the class "main-content" -->
+<div class="main-content"></div>
+<!-- Modal dialogs -->
+<div class="modal" id="studentListModal">
+    <!-- Content for "Список студентов" modal -->
+    <h1>Список студентов</h1>
+    <div>
+        <button onclick="fetchAndDisplayStudents()">Получить список студентов</button>
+
+
+    </div>
+</div>
+
+<div class="modal" id="searchStudentModal">
+    <!-- Content for "Поиск студента" modal -->
+    <h1>Поиск студента</h1>
+    <div>
+        <div>
+            <label for="searchName">Поиск по имени:</label>
+            <input type="text" id="searchName">
+            <button onclick="searchStudentsByName()">Найти студентов</button>
+        </div>
+    </div>
+</div>
+
+<div class="modal" id="createStudentModal">
+    <!-- Content for "Создание студента" modal -->
+    <h1>Создание студента</h1>
+    <div>
+        <div>
+            <label for="studentName">Имя студента:</label>
+            <input type="text" id="studentName">
+        </div>
+        <div>
+            <label for="studentAge">Возраст студента:</label>
+            <input type="number" id="studentAge">
+        </div>
+        <button onclick="createStudent()">Создать студента</button>
+        </div>
+    </div>
+</div>
+
+<script src="Students.js"></script>
+</body>
+</html>

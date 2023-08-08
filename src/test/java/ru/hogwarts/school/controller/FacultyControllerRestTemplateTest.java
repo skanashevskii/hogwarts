@@ -1,7 +1,7 @@
-package ru.hogwarts.school;
+package ru.hogwarts.school.controller;
 
 import org.springframework.http.*;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +24,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class FacultyControllerRestTemplateTests {
+class FacultyControllerRestTemplateTest {
     @LocalServerPort
     private int port;
     @Autowired
