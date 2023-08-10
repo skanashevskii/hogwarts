@@ -7,3 +7,5 @@ SELECT * FROM student where name like '%g%';
 SELECT name FROM student where id<age;
 
 SELECT * FROM student order by age;
+select * from student where age=null;
+select * from faculty;
