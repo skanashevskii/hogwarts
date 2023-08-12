@@ -1,6 +1,12 @@
 package ru.hogwarts.school.controllers;
 
+import io.swagger.annotations.ApiOperation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -15,6 +21,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
+
 
 @RestController
 @RequestMapping("avatar")
@@ -22,6 +33,7 @@ import java.nio.file.Path;
 
 public class AvatarController {
     private final AvatarService avatarService;
+
     public AvatarController(AvatarService avatarService) {
         this.avatarService = avatarService;
     }
@@ -47,6 +59,33 @@ public class AvatarController {
                 .status(HttpStatus.OK)
                 .headers(headers)
                 .body(avatar.getPreview());
+    }
+    @GetMapping(value = "/page-avatars-from-db")
+    public ResponseEntity<Page<Avatar>> downloadAvatars(@RequestParam(defaultValue = "1") Integer page,
+                                                        @RequestParam(defaultValue = "3") Integer size) {
+        Pageable pageable = PageRequest.of(page - 1, size);
+        Page<Avatar> avatarPage = avatarService.listAvatars(pageable);
+
+        List<Avatar> avatars = avatarPage.getContent();
+        for (Avatar avatar : avatars) {
+            try {
+                Path filePath = Paths.get(avatar.getFilePath());
+                byte[] preview = avatarService.generateImagePreview(filePath);
+                avatar.setPreview(preview);
+            } catch (IOException e) {
+                // Обработка исключения, если не удалось сгенерировать предварительное изображение
+                e.printStackTrace();
+            }
+        }
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("X-Total-Count", String.valueOf(avatarPage.getTotalElements()));
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .headers(headers)
+                .body(avatarPage);
     }
 
 

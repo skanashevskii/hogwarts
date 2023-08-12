@@ -77,6 +77,21 @@ public class StudentController {
         }
         return ResponseEntity.ok(student.getFaculty());
     }
+    @GetMapping("/count-students")
+    @Operation(summary = "Количество студентов")
+    public Integer getCountStudents(){
+        return studentService.getCountStudents();
+    }
+    @GetMapping("/average-age-students")
+    @Operation(summary = "Средний возраст студентов")
+    public Integer getAvgAgeStudents(){
+        return studentService.getAvgAgeStudents();
+    }
+    @GetMapping("/last-five-students")
+    @Operation(summary = "Последние 5 студентов")
+    public Collection<Student> getLastFiveStudents(){
+        return studentService.getLastFiveStudents();
+    }
 
 
     @PostMapping
