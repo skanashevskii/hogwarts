@@ -83,7 +83,7 @@ public class AvatarService {
     public Avatar findAvatar(Long studentId) {
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
-    public Page<Avatar> listAvatars(Pageable pageable){
+    public Page<Avatar> listAvatars(Pageable pageable) {
         return avatarRepository.findAll(pageable);
     }
 

@@ -87,6 +87,12 @@
             <artifactId>springfox-boot-starter</artifactId>
             <version>3.0.0</version> <!-- Подставьте актуальную версию Springfox -->
         </dependency>
+        <dependency>
+            <groupId>org.liquibase</groupId>
+            <artifactId>liquibase-core</artifactId>
+            <version>4.23.0</version>
+        </dependency>
+
 
     </dependencies>
 

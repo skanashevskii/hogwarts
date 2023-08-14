@@ -1,5 +1,7 @@
 package ru.hogwarts.school.controller;
 
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.http.*;
 
 import org.assertj.core.api.Assertions;
@@ -10,12 +12,18 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.core.ParameterizedTypeReference;
 
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 import ru.hogwarts.school.controllers.FacultyController;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repositories.FacultyRepository;
+import ru.hogwarts.school.repositories.StudentRepository;
 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -24,6 +32,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+
 class FacultyControllerRestTemplateTest {
     @LocalServerPort
     private int port;
@@ -32,6 +41,18 @@ class FacultyControllerRestTemplateTest {
 
     @Autowired
     private TestRestTemplate restTemplate;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private FacultyRepository facultyRepository;
+  /*  @BeforeEach
+    public void setUp() {
+        studentRepository.deleteAll();
+    }*/
+    @AfterEach
+    public void cleanUp() {
+        studentRepository.deleteAll();
+    }
 
     @Test
     public void contextLoads() throws Exception{
@@ -68,7 +89,7 @@ class FacultyControllerRestTemplateTest {
     }
     @Test
     public void testFindFacultiesByColor() throws Exception {
-        String color = "blue"; // Нужный цвет для тестирования
+        String color = "red"; // Нужный цвет для тестирования
 
         ResponseEntity<Collection<Faculty>> response = this.restTemplate.exchange(
                 "http://localhost:" + port + "/faculty/byColorOrName?color="+color,
@@ -104,6 +125,7 @@ class FacultyControllerRestTemplateTest {
         Collection<Faculty> faculties = response.getBody();
 
         // Check if the list of faculties contains faculties with the specified name (case-insensitive)
+        assert faculties != null;
         boolean hasFacultyWithName = faculties.stream()
                 .anyMatch(faculty -> faculty.getName().equalsIgnoreCase(nameFaculty));
         assertThat(hasFacultyWithName).isTrue();
@@ -111,13 +133,13 @@ class FacultyControllerRestTemplateTest {
     }
 
     @Test
+    @Sql(scripts = {"/insert-test-data.sql"}) // Путь к SQL-скрипту с тестовыми данными
     public void testGetStudentsByFacultyId() throws Exception {
         long facultyId = 1L; // ID факультета для теста
-
         // Фиктивный список студентов для теста
         List<Student> students = new ArrayList<>();
-        students.add(new Student(1L, "Шариков", 25));
-        students.add(new Student(2L, "Петров", 23));
+        students.add(new Student(1L, "Тестовый1", 20));
+        students.add(new Student(2L, "Тестовый2", 23));
 
         // GET запрос к ендпоинту
         ResponseEntity<List<Student>> response = restTemplate.exchange(
@@ -130,6 +152,7 @@ class FacultyControllerRestTemplateTest {
         assertThat(response.getStatusCode()).isEqualTo(HttpStatus.OK);
         assertThat(response.getBody()).isNotNull();
         assertThat(response.getBody()).isEqualTo(students);
+
     }
     @Test
     public void testEditFaculty() throws Exception {

@@ -18,6 +18,7 @@ import java.util.Collections;
 
 
 @RestController
+@CrossOrigin(origins = "http://localhost:63342")
 @RequestMapping("student")
 @Tag(name = "Студенты", description = "Методы работы со студентами")
 
