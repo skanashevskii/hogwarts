@@ -8,6 +8,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 
 // Закомментируйте или удалите эту аннотацию, если не требуются настройки
+
 //@Configuration
 public class TestConfig {
     @Bean
