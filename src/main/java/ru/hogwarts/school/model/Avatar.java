@@ -4,6 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 
+import java.util.Arrays;
+
 @Entity
 public class Avatar {
     @Min(1)
@@ -71,5 +73,17 @@ public class Avatar {
 
     public void setStudent(Student student) {
         this.student = student;
+    }
+
+    @Override
+    public String toString() {
+        return "Avatar{" +
+                "id=" + id +
+                ", filePath='" + filePath + '\'' +
+                ", fileSize=" + fileSize +
+                ", mediaType='" + mediaType + '\'' +
+                ", preview=" + Arrays.toString(preview) +
+                ", student=" + student +
+                '}';
     }
 }

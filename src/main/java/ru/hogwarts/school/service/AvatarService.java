@@ -1,6 +1,8 @@
 package ru.hogwarts.school.service;
 
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -32,6 +34,7 @@ public class AvatarService {
     private final AvatarRepository avatarRepository;
 
     private final StudentService studentService;
+    private static final Logger LOGGER = LoggerFactory.getLogger(AvatarService.class);
 
     public AvatarService(AvatarRepository avatarRepository, StudentService studentService) {
         this.avatarRepository = avatarRepository;
@@ -40,7 +43,9 @@ public class AvatarService {
     }
 
     public void uploadAvatar(Long studentId, MultipartFile avatarFile) throws IOException {
+        LOGGER.info("Uploading avatar for student with ID: {}", studentId);
         Student student = studentService.findStudentById(studentId);
+
         //путь к папке где аватар и берем расширение файла(т е после ".")
         Path filePath = Path.of(avatarsDir, studentId + "." + getExtensions(avatarFile.getOriginalFilename()));
         //проверка папки по указанному пути и если нет то создаст
@@ -72,6 +77,7 @@ public class AvatarService {
         avatar.setPreview(generateImagePreview(filePath));
         //сохраняем в БД
         avatarRepository.save(avatar);
+        LOGGER.info("Avatar uploaded successfully for student with ID: {}", studentId);
     }
 
     /**
@@ -81,9 +87,13 @@ public class AvatarService {
      * @return возврашает найденное или создает новый
      */
     public Avatar findAvatar(Long studentId) {
+        LOGGER.info("Finding avatar for student with ID: {}", studentId);
         return avatarRepository.findByStudentId(studentId).orElse(new Avatar());
     }
     public Page<Avatar> listAvatars(Pageable pageable) {
+        LOGGER.info("Listing avatars with pagination: page={}, size={}",
+                pageable.getPageNumber(),
+                pageable.getPageSize());
         return avatarRepository.findAll(pageable);
     }
 
@@ -95,6 +105,7 @@ public class AvatarService {
      * @throws IOException
      */
     public byte[] generateImagePreview(Path filePath) throws IOException {
+        LOGGER.info("Generating image preview for file: {}", filePath);
         try (InputStream is = Files.newInputStream(filePath);
             BufferedInputStream bis = new BufferedInputStream(is, 1024);
             ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -107,12 +118,16 @@ public class AvatarService {
             graphics2D.dispose();
 
             ImageIO.write(preview, getExtensions(filePath.getFileName().toString()), baos);
+            LOGGER.info("Image preview generated for file: {}", filePath);
             return baos.toByteArray();
         }
 
     }
 
     private String getExtensions(String fileName) {
-        return fileName.substring(fileName.lastIndexOf(".") + 1);
+        LOGGER.debug("Getting extension for file name: {}", fileName);
+        String extension = fileName.substring(fileName.lastIndexOf(".") + 1);
+        LOGGER.debug("Extension found: {}", extension);
+        return extension;
     }
 }
