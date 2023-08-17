@@ -1,5 +1,7 @@
 package ru.hogwarts.school.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.school.model.Faculty;
 
@@ -14,6 +16,7 @@ import java.util.*;
 @Service
 public class FacultyService {
     private final FacultyRepository facultyRepository;
+    private static final Logger LOGGER = LoggerFactory.getLogger(FacultyService.class);
 
     public FacultyService(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
@@ -21,14 +24,17 @@ public class FacultyService {
     }
 
     public Faculty createFaculty(Faculty faculty) {
+        LOGGER.info("Creating faculty: {}", faculty);
         return facultyRepository.save(faculty);
     }
 
     public Faculty findFacultyById(long id) {
+        LOGGER.info("Finding faculty: {}", id);
         return facultyRepository.findById(id).orElse(null);
     }
 
     public Faculty editFaculty(Faculty faculty) {
+        LOGGER.info("Editing faculty: {}", faculty);
         return facultyRepository.findById(faculty.getId())
                 .map(dbEntity ->{
                     dbEntity.setName(faculty.getName());
@@ -40,6 +46,7 @@ public class FacultyService {
     }
 
     public boolean deleteFaculty(long id) {
+        LOGGER.info("Deleting faculty: {}", id);
         return facultyRepository.findById(id)
                 .map(entity -> {
                     facultyRepository.delete(entity);
@@ -50,18 +57,27 @@ public class FacultyService {
     }
 
     public Collection<Faculty> findAllbyColorIgnoreCase(String color) {
-
+        LOGGER.info("Finding all by color (case insensitive): {}", color);
         return facultyRepository.findByColorIgnoreCase(color);
 
     }
     public Collection<Faculty> findAllbyNameIgnoreCase(String nameFaculty) {
-
+        LOGGER.info("Finding all by name (case insensitive): {}", nameFaculty);
         return facultyRepository.findByNameIgnoreCase(nameFaculty);
 
     }
 
     public Collection<Student> getStudentsByFacultyId(long facultyId) {
-        return facultyRepository.findById(facultyId).get().getStudents();
+        LOGGER.info("Finding students by faculty ID: {}", facultyId);
+        Faculty faculty = facultyRepository.findById(facultyId).orElse(null);
+        if (faculty != null) {
+            Collection<Student> students = faculty.getStudents();
+            LOGGER.info("Found {} students for faculty ID: {}", students.size(), facultyId);
+            return students;
+        } else {
+            LOGGER.warn("Faculty not found for ID: {}", facultyId);
+            return Collections.emptyList();
+        }
     }
 
 

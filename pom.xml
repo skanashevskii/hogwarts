@@ -20,6 +20,7 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
+            <version>3.1.2</version>
         </dependency>
         <!-- для работы с JPA-->
         <dependency>
@@ -48,12 +49,12 @@
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct</artifactId>
-            <version>1.4.2.Final</version> <!-- Последняя версия на момент написания ответа -->
+            <version>1.5.5.Final</version> <!-- Последняя версия на момент написания ответа -->
         </dependency>
         <dependency>
             <groupId>org.mapstruct</groupId>
             <artifactId>mapstruct-processor</artifactId>
-            <version>1.4.2.Final</version> <!-- Используйте актуальную версию MapStruct -->
+            <version>1.5.5.Final</version> <!-- Используйте актуальную версию MapStruct -->
             <scope>provided</scope>
         </dependency>
 

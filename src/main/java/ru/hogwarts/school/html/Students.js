@@ -64,6 +64,7 @@
                 <th>Возраст</th>
                 <th>Факультет</th>
             </tr>
+
         `;
         students.forEach(student => {
             const row = table.insertRow();
