@@ -3,17 +3,16 @@ package ru.hogwarts.school.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.model.Faculty;
 
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repositories.FacultyRepository;
 import ru.hogwarts.school.service.FacultyService;
 
 
-import java.util.Collection;
-import java.util.Collections;
+import java.util.*;
 
 
 @RestController
@@ -22,9 +21,22 @@ import java.util.Collections;
 
 public class FacultyController {
     private final FacultyService facultyService;
+    private final FacultyRepository facultyRepository;
 
-    public FacultyController(FacultyService facultyService) {
+    public FacultyController(FacultyService facultyService, FacultyRepository facultyRepository) {
         this.facultyService = facultyService;
+        this.facultyRepository = facultyRepository;
+    }
+    @GetMapping("/longest-name")
+    @Operation(summary = "Самое длинное имя")
+    public String getLongestFacultyName() {
+        List<Faculty> faculties = facultyRepository.findAll();
+
+        Optional<String> longestFacultyName = faculties.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length));
+
+        return longestFacultyName.orElse("No faculty found");
     }
 
     @GetMapping("{id}")

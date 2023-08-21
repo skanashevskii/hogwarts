@@ -8,13 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.dto.StudentDTO;
-import ru.hogwarts.school.dto.StudentMapper;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -25,10 +30,69 @@ import java.util.Collections;
 public class StudentController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
     private final StudentService studentService;
+    private final StudentRepository studentRepository;
 
 
-    public StudentController(StudentService studentService) {
+    public StudentController(StudentService studentService, StudentRepository studentRepository) {
         this.studentService = studentService;
+        this.studentRepository = studentRepository;
+    }
+    @GetMapping("/sum")
+    public int calculateSum() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        int sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()  // Включение параллельных вычислений
+                .reduce(0, (a, b) -> a + b);
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return sum;
+    }
+
+    @GetMapping("/starting-with-a")
+    @Operation(summary = "Информация о всех студентах начало имени на А")
+
+    public List<String> getStudentNamesStartingWithA() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<String> studentNamesStartingWithA = studentRepository.findAll()
+                .stream()
+                .filter(student -> student.getName().startsWith("A"))
+                .map(student -> student.getName().toUpperCase())
+                .sorted()
+                .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return studentNamesStartingWithA;
+    }
+    @GetMapping("/average-age-students")
+    @Operation(summary = "Средний возраст студентов")
+    public Integer getAvgAgeStudents(){
+        return studentService.getAvgAgeStudents();
+    }
+    @GetMapping("/average-age")
+    @Operation(summary = "Средний возраст студентов через Stream")
+    public double getAverageStudentAge() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<Student> students = studentRepository.findAll();
+
+        double averageAge = students.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0); // По умолчанию 0, если нет студентов
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return averageAge;
     }
     @GetMapping("all")
     @Operation(summary = "Информация о всех студентах,по имени,по части имени")
@@ -83,11 +147,7 @@ public class StudentController {
     public Integer getCountStudents(){
         return studentService.getCountStudents();
     }
-    @GetMapping("/average-age-students")
-    @Operation(summary = "Средний возраст студентов")
-    public Integer getAvgAgeStudents(){
-        return studentService.getAvgAgeStudents();
-    }
+
     @GetMapping("/last-five-students")
     @Operation(summary = "Последние 5 студентов")
     public Collection<Student> getLastFiveStudents(){
@@ -144,12 +204,21 @@ public class StudentController {
     @GetMapping("age/2")
     @Operation(summary = "Поиск студентов(а) по возрасту")
     public ResponseEntity<Collection<StudentDTO>> findStudents2(@RequestParam int age) {
+
+        Instant startTime = Instant.now(); // Засекаем время перед выполнением
+
         Collection<StudentDTO> students;
         if (age > 0) {
             students = studentService.findByAge2(age);
         } else {
             students = Collections.emptyList();
         }
+
+        Instant endTime = Instant.now(); // Засекаем время после выполнения
+        Duration duration = Duration.between(startTime, endTime); // Вычисляем продолжительность выполнения
+
+        System.out.println("Время выполнения: " + duration.toMillis() + " ms");
+
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
