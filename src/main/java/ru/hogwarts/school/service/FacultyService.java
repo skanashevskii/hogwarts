@@ -22,6 +22,15 @@ public class FacultyService {
         this.facultyRepository = facultyRepository;
 
     }
+    public String getLongestFacultyName() {
+        List<Faculty> faculties = facultyRepository.findAll();
+
+        Optional<String> longestFacultyName = faculties.stream()
+                .map(Faculty::getName)
+                .max(Comparator.comparingInt(String::length));
+
+        return longestFacultyName.orElse("No faculty found");
+    }
 
     public Faculty createFaculty(Faculty faculty) {
         LOGGER.info("Creating faculty: {}", faculty);
