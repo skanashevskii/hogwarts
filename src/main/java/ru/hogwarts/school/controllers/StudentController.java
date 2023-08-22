@@ -30,79 +30,47 @@ import java.util.stream.Stream;
 public class StudentController {
     private static final Logger LOGGER = LoggerFactory.getLogger(StudentController.class);
     private final StudentService studentService;
-    private final StudentRepository studentRepository;
 
 
-    public StudentController(StudentService studentService, StudentRepository studentRepository) {
+    public StudentController(StudentService studentService) {
         this.studentService = studentService;
-        this.studentRepository = studentRepository;
+
     }
+
     @GetMapping("/sum")
     public int calculateSum() {
-        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
-        int sum = Stream.iterate(1, a -> a + 1)
-                .limit(1_000_000)
-                .parallel()  // Включение параллельных вычислений
-                .reduce(0, (a, b) -> a + b);
-
-        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
-        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
-
-        System.out.println("Время выполнения: " + executionTime + " ms");
-
-        return sum;
+        return studentService.calculateSum();
     }
 
     @GetMapping("/starting-with-a")
     @Operation(summary = "Информация о всех студентах начало имени на А")
 
     public List<String> getStudentNamesStartingWithA() {
-        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
-        List<String> studentNamesStartingWithA = studentRepository.findAll()
-                .stream()
-                .filter(student -> student.getName().startsWith("A"))
-                .map(student -> student.getName().toUpperCase())
-                .sorted()
-                .collect(Collectors.toList());
-        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
-        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
-
-        System.out.println("Время выполнения: " + executionTime + " ms");
-
-        return studentNamesStartingWithA;
+        return studentService.getStudentNamesStartingWithA();
     }
+
     @GetMapping("/average-age-students")
     @Operation(summary = "Средний возраст студентов")
-    public Integer getAvgAgeStudents(){
+    public Integer getAvgAgeStudents() {
         return studentService.getAvgAgeStudents();
     }
+
     @GetMapping("/average-age")
     @Operation(summary = "Средний возраст студентов через Stream")
-    public double getAverageStudentAge() {
-        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
-        List<Student> students = studentRepository.findAll();
-
-        double averageAge = students.stream()
-                .mapToInt(Student::getAge)
-                .average()
-                .orElse(0.0); // По умолчанию 0, если нет студентов
-
-        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
-        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
-
-        System.out.println("Время выполнения: " + executionTime + " ms");
-
-        return averageAge;
+    public Double getAverageStudentAge() {
+        return studentService.getAverageStudentAge();
     }
+
     @GetMapping("all")
     @Operation(summary = "Информация о всех студентах,по имени,по части имени")
-    public ResponseEntity findStudents(@RequestParam(required = false) String name){
+    public ResponseEntity findStudents(@RequestParam(required = false) String name) {
 
-        if(name != null && !name.isBlank()){
+        if (name != null && !name.isBlank()) {
             return ResponseEntity.ok(studentService.findByNameContainingIgnoreCase(name));
         }
         return ResponseEntity.ok(studentService.getAllStudent());
     }
+
     @GetMapping("all/2")
     @Operation(summary = "Информация о всех студентах, по имени, по части имени")
     public ResponseEntity<Collection<StudentDTO>> findStudents2(@RequestParam(required = false) String name) {
@@ -124,6 +92,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(student);
     }
+
     @GetMapping("{id}/2")
     @Operation(summary = "Информация о студенте по id")
     public ResponseEntity<StudentDTO> getStudentInfo2(@PathVariable Long id) {
@@ -133,6 +102,7 @@ public class StudentController {
         }
         return new ResponseEntity<>(studentDTO, HttpStatus.OK);
     }
+
     @GetMapping("{studentId}/faculty")
     @Operation(summary = "Получение студентов факультета по его ID")
     public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long studentId) {
@@ -142,15 +112,16 @@ public class StudentController {
         }
         return ResponseEntity.ok(student.getFaculty());
     }
+
     @GetMapping("/count-students")
     @Operation(summary = "Количество студентов")
-    public Integer getCountStudents(){
+    public Integer getCountStudents() {
         return studentService.getCountStudents();
     }
 
     @GetMapping("/last-five-students")
     @Operation(summary = "Последние 5 студентов")
-    public Collection<Student> getLastFiveStudents(){
+    public Collection<Student> getLastFiveStudents() {
         return studentService.getLastFiveStudents();
     }
 
@@ -161,6 +132,7 @@ public class StudentController {
         LOGGER.info("Received request to save student: {}", student);
         return studentService.createStudent(student);
     }
+
     @PostMapping("/create2")
     @Operation(summary = "Создание студента2")
     public ResponseEntity<StudentDTO> createStudent2(@RequestBody StudentDTO studentDTO) {
@@ -177,6 +149,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(foundStudent);
     }
+
     @PutMapping("/2")
     @Operation(summary = "Изменение инфо о студенте")
     public ResponseEntity<StudentDTO> editStudent(@RequestBody StudentDTO studentDTO) {
@@ -193,6 +166,7 @@ public class StudentController {
         studentService.deleteStudent(id);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("age")
     @Operation(summary = "Поиск студентов(а) по возрасту")
     public ResponseEntity<Collection<Student>> findStudents(@RequestParam int age) {
@@ -201,6 +175,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
+
     @GetMapping("age/2")
     @Operation(summary = "Поиск студентов(а) по возрасту")
     public ResponseEntity<Collection<StudentDTO>> findStudents2(@RequestParam int age) {
@@ -227,14 +202,15 @@ public class StudentController {
     public ResponseEntity<Collection<Student>> findStudentsByAgeBetween(@RequestParam int minAge,
                                                                         @RequestParam int maxAge) {
         if (minAge > 0) {
-            return ResponseEntity.ok(studentService.findByAgeBetween(minAge,maxAge));
+            return ResponseEntity.ok(studentService.findByAgeBetween(minAge, maxAge));
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
+
     @GetMapping("/byAgeBetween/2")
     @Operation(summary = "Поиск студентов по возрасту в диапазоне между min и max")
     public ResponseEntity<Collection<StudentDTO>> findStudentsByAgeBetween2(@RequestParam int minAge,
-                                                                     @RequestParam int maxAge) {
+                                                                            @RequestParam int maxAge) {
         Collection<StudentDTO> students;
         if (minAge > 0) {
             students = studentService.findByAgeBetween2(minAge, maxAge);
@@ -243,11 +219,13 @@ public class StudentController {
         }
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
+
     @GetMapping("/byFaculty")
     @Operation(summary = "Поиск студентов по Id факультета")
-    public Collection<Student> findStudentByFaculty(@RequestParam long faculId){
+    public Collection<Student> findStudentByFaculty(@RequestParam long faculId) {
         return studentService.findStudentByFaculty(faculId);
     }
+
     @GetMapping("/byFaculty/2")
     @Operation(summary = "Поиск студентов по Id факультета")
     public ResponseEntity<Collection<StudentDTO>> findStudentByFaculty2(@RequestParam long faculId) {

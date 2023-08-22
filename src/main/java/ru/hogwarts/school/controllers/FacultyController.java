@@ -30,13 +30,7 @@ public class FacultyController {
     @GetMapping("/longest-name")
     @Operation(summary = "Самое длинное имя")
     public String getLongestFacultyName() {
-        List<Faculty> faculties = facultyRepository.findAll();
-
-        Optional<String> longestFacultyName = faculties.stream()
-                .map(Faculty::getName)
-                .max(Comparator.comparingInt(String::length));
-
-        return longestFacultyName.orElse("No faculty found");
+        return facultyService.getLongestFacultyName();
     }
 
     @GetMapping("{id}")

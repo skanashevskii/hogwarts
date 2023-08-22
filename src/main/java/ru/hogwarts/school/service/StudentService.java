@@ -12,7 +12,9 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -26,6 +28,51 @@ public class StudentService {
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
         this.studentMapper = StudentMapper.INSTANCE;
+    }
+    public double getAverageStudentAge() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<Student> students = studentRepository.findAll();
+
+        double averageAge = students.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0); // По умолчанию 0, если нет студентов
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return averageAge;
+    }
+    public List<String> getStudentNamesStartingWithA() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<String> studentNamesStartingWithA = studentRepository.findAll()
+        .stream()
+                .filter(student -> student.getName().startsWith("A"))
+                .map(student -> student.getName().toUpperCase())
+                .sorted()
+                .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms service");
+
+        return studentNamesStartingWithA;
+    }
+    public int calculateSum() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        int sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()  // Включение параллельных вычислений
+                .reduce(0, (a, b) -> a + b);
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return sum;
     }
 
     public Student createStudent(Student student) {
