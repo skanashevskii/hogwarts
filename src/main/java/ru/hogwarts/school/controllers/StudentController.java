@@ -36,6 +36,18 @@ public class StudentController {
         this.studentService = studentService;
 
     }
+    @GetMapping("/process")
+    @Operation(summary = "Информация о студентах используя поток")
+    public String processStudents() {
+        studentService.processStudents();
+        return "Processing students...";
+    }
+    @GetMapping("/process2")
+    @Operation(summary = "Информация о студентах используя синхронтзированный поток")
+    public String processStudents2() {
+        studentService.processStudents();
+        return "Processing students...";
+    }
 
     @GetMapping("/sum")
     public int calculateSum() {

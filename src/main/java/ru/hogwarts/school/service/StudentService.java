@@ -29,6 +29,67 @@ public class StudentService {
         this.studentRepository = studentRepository;
         this.studentMapper = StudentMapper.INSTANCE;
     }
+    public synchronized void printStudentName(Student student) {
+        System.out.println(Thread.currentThread().getName() + ": " + student.getName());
+    }
+
+    public void processStudents2() {
+        List<Student> students = studentRepository.findAll();
+
+        Thread thread1 = new Thread(() -> {
+            printStudentName(students.get(0));
+            printStudentName(students.get(1));
+        });
+
+        Thread thread2 = new Thread(() -> {
+            printStudentName(students.get(2));
+            printStudentName(students.get(3));
+        });
+
+        Thread thread3 = new Thread(() -> {
+            printStudentName(students.get(4));
+            printStudentName(students.get(5));
+        });
+
+        thread1.start();
+        thread2.start();
+        thread3.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+            thread3.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void processStudents() {
+        List<Student> students = studentRepository.findAll();
+
+        System.out.println("Main Thread: " + students.get(0).getName());
+        System.out.println("Main Thread: " + students.get(1).getName());
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println("Thread 1: " + students.get(2).getName());
+            System.out.println("Thread 1: " + students.get(3).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Thread 2: " + students.get(4).getName());
+            System.out.println("Thread 2: " + students.get(5).getName());
+        });
+
+        thread1.start();
+        thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
     public double getAverageStudentAge() {
         long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
         List<Student> students = studentRepository.findAll();
