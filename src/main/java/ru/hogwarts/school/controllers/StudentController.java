@@ -8,13 +8,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.hogwarts.school.dto.StudentDTO;
-import ru.hogwarts.school.dto.StudentMapper;
 import ru.hogwarts.school.model.Faculty;
 import ru.hogwarts.school.model.Student;
+import ru.hogwarts.school.repositories.StudentRepository;
 import ru.hogwarts.school.service.StudentService;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -29,16 +34,55 @@ public class StudentController {
 
     public StudentController(StudentService studentService) {
         this.studentService = studentService;
+
     }
+    @GetMapping("/process")
+    @Operation(summary = "Информация о студентах используя поток")
+    public String processStudents() {
+        studentService.processStudents();
+        return "Processing students...";
+    }
+    @GetMapping("/process2")
+    @Operation(summary = "Информация о студентах используя синхронтзированный поток")
+    public String processStudents2() {
+        studentService.processStudents();
+        return "Processing students...";
+    }
+
+    @GetMapping("/sum")
+    public int calculateSum() {
+        return studentService.calculateSum();
+    }
+
+    @GetMapping("/starting-with-a")
+    @Operation(summary = "Информация о всех студентах начало имени на А")
+
+    public List<String> getStudentNamesStartingWithA() {
+        return studentService.getStudentNamesStartingWithA();
+    }
+
+    @GetMapping("/average-age-students")
+    @Operation(summary = "Средний возраст студентов")
+    public Integer getAvgAgeStudents() {
+        return studentService.getAvgAgeStudents();
+    }
+
+    @GetMapping("/average-age")
+    @Operation(summary = "Средний возраст студентов через Stream")
+    public Double getAverageStudentAge() {
+        return studentService.getAverageStudentAge();
+    }
+
     @GetMapping("all")
     @Operation(summary = "Информация о всех студентах,по имени,по части имени")
-    public ResponseEntity findStudents(@RequestParam(required = false) String name){
+    public ResponseEntity findStudents(@RequestParam(required = false) String name) {
 
-        if(name != null && !name.isBlank()){
+        if (name != null && !name.isBlank()) {
             return ResponseEntity.ok(studentService.findByNameContainingIgnoreCase(name));
         }
         return ResponseEntity.ok(studentService.getAllStudent());
     }
+
     @GetMapping("all/2")
     @Operation(summary = "Информация о всех студентах, по имени, по части имени")
     public ResponseEntity<Collection<StudentDTO>> findStudents2(@RequestParam(required = false) String name) {
@@ -60,6 +104,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(student);
     }
+
     @GetMapping("{id}/2")
     @Operation(summary = "Информация о студенте по id")
     public ResponseEntity<StudentDTO> getStudentInfo2(@PathVariable Long id) {
@@ -69,6 +114,7 @@ public class StudentController {
         }
         return new ResponseEntity<>(studentDTO, HttpStatus.OK);
     }
+
     @GetMapping("{studentId}/faculty")
     @Operation(summary = "Получение студентов факультета по его ID")
     public ResponseEntity<Faculty> getFacultyByStudentId(@PathVariable Long studentId) {
@@ -78,19 +124,16 @@ public class StudentController {
         }
         return ResponseEntity.ok(student.getFaculty());
     }
+
     @GetMapping("/count-students")
     @Operation(summary = "Количество студентов")
-    public Integer getCountStudents(){
+    public Integer getCountStudents() {
         return studentService.getCountStudents();
     }
-    @GetMapping("/average-age-students")
-    @Operation(summary = "Средний возраст студентов")
-    public Integer getAvgAgeStudents(){
-        return studentService.getAvgAgeStudents();
-    }
+
     @GetMapping("/last-five-students")
     @Operation(summary = "Последние 5 студентов")
-    public Collection<Student> getLastFiveStudents(){
+    public Collection<Student> getLastFiveStudents() {
         return studentService.getLastFiveStudents();
     }
 
@@ -101,6 +144,7 @@ public class StudentController {
         LOGGER.info("Received request to save student: {}", student);
         return studentService.createStudent(student);
     }
+
     @PostMapping("/create2")
     @Operation(summary = "Создание студента2")
     public ResponseEntity<StudentDTO> createStudent2(@RequestBody StudentDTO studentDTO) {
@@ -117,6 +161,7 @@ public class StudentController {
         }
         return ResponseEntity.ok(foundStudent);
     }
+
     @PutMapping("/2")
     @Operation(summary = "Изменение инфо о студенте")
     public ResponseEntity<StudentDTO> editStudent(@RequestBody StudentDTO studentDTO) {
@@ -133,6 +178,7 @@ public class StudentController {
         studentService.deleteStudent(id);
         return ResponseEntity.ok().build();
     }
+
     @GetMapping("age")
     @Operation(summary = "Поиск студентов(а) по возрасту")
     public ResponseEntity<Collection<Student>> findStudents(@RequestParam int age) {
@@ -141,15 +187,25 @@ public class StudentController {
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
+
     @GetMapping("age/2")
     @Operation(summary = "Поиск студентов(а) по возрасту")
     public ResponseEntity<Collection<StudentDTO>> findStudents2(@RequestParam int age) {
+
+        Instant startTime = Instant.now(); // Засекаем время перед выполнением
+
         Collection<StudentDTO> students;
         if (age > 0) {
             students = studentService.findByAge2(age);
         } else {
             students = Collections.emptyList();
         }
+
+        Instant endTime = Instant.now(); // Засекаем время после выполнения
+        Duration duration = Duration.between(startTime, endTime); // Вычисляем продолжительность выполнения
+
+        System.out.println("Время выполнения: " + duration.toMillis() + " ms");
+
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
 
@@ -158,14 +214,15 @@ public class StudentController {
     public ResponseEntity<Collection<Student>> findStudentsByAgeBetween(@RequestParam int minAge,
                                                                         @RequestParam int maxAge) {
         if (minAge > 0) {
-            return ResponseEntity.ok(studentService.findByAgeBetween(minAge,maxAge));
+            return ResponseEntity.ok(studentService.findByAgeBetween(minAge, maxAge));
         }
         return ResponseEntity.ok(Collections.emptyList());
     }
+
     @GetMapping("/byAgeBetween/2")
     @Operation(summary = "Поиск студентов по возрасту в диапазоне между min и max")
     public ResponseEntity<Collection<StudentDTO>> findStudentsByAgeBetween2(@RequestParam int minAge,
-                                                                     @RequestParam int maxAge) {
+                                                                            @RequestParam int maxAge) {
         Collection<StudentDTO> students;
         if (minAge > 0) {
             students = studentService.findByAgeBetween2(minAge, maxAge);
@@ -174,11 +231,13 @@ public class StudentController {
         }
         return new ResponseEntity<>(students, HttpStatus.OK);
     }
+
     @GetMapping("/byFaculty")
     @Operation(summary = "Поиск студентов по Id факультета")
-    public Collection<Student> findStudentByFaculty(@RequestParam long faculId){
+    public Collection<Student> findStudentByFaculty(@RequestParam long faculId) {
         return studentService.findStudentByFaculty(faculId);
     }
+
     @GetMapping("/byFaculty/2")
     @Operation(summary = "Поиск студентов по Id факультета")
     public ResponseEntity<Collection<StudentDTO>> findStudentByFaculty2(@RequestParam long faculId) {

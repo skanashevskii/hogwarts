@@ -222,6 +222,23 @@ public class StudentControllerMvcTest {
                 .andExpect(status().isOk())
                 .andExpect(content().json("[]"));
     }
+    @Test
+    public void testGetStudentNamesStartingWithA() throws Exception {
+        // Создаем тестовые данные
+        Student student1 = new Student(1L,"Alice",23);
+        Student student2 = new Student(2L,"Bob",22);
+        Student student3 = new Student(3L,"Amy",16);
+        List<Student> students = Arrays.asList(student1, student2, student3);
+
+        // Определяем поведение мока репозитория
+        when(studentRepository.findAll()).thenReturn(students);
+
+        mockMvc.perform(MockMvcRequestBuilders
+                .get("/student/starting-with-a"))
+                .andExpect(status().isOk())
+                .andExpect(content().json("['ALICE', 'AMY']")); // Ожидаемые имена в верхнем регистре
+
+    }
 
 
 }

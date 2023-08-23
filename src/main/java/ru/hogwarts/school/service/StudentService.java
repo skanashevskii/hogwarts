@@ -12,7 +12,9 @@ import ru.hogwarts.school.model.Student;
 import ru.hogwarts.school.repositories.StudentRepository;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -26,6 +28,112 @@ public class StudentService {
     public StudentService(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
         this.studentMapper = StudentMapper.INSTANCE;
+    }
+    public synchronized void printStudentName(Student student) {
+        System.out.println(Thread.currentThread().getName() + ": " + student.getName());
+    }
+
+    public void processStudents2() {
+        List<Student> students = studentRepository.findAll();
+
+        Thread thread1 = new Thread(() -> {
+            printStudentName(students.get(0));
+            printStudentName(students.get(1));
+        });
+
+        Thread thread2 = new Thread(() -> {
+            printStudentName(students.get(2));
+            printStudentName(students.get(3));
+        });
+
+        Thread thread3 = new Thread(() -> {
+            printStudentName(students.get(4));
+            printStudentName(students.get(5));
+        });
+
+        thread1.start();
+        thread2.start();
+        thread3.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+            thread3.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void processStudents() {
+        List<Student> students = studentRepository.findAll();
+
+        System.out.println("Main Thread: " + students.get(0).getName());
+        System.out.println("Main Thread: " + students.get(1).getName());
+
+        Thread thread1 = new Thread(() -> {
+            System.out.println("Thread 1: " + students.get(2).getName());
+            System.out.println("Thread 1: " + students.get(3).getName());
+        });
+
+        Thread thread2 = new Thread(() -> {
+            System.out.println("Thread 2: " + students.get(4).getName());
+            System.out.println("Thread 2: " + students.get(5).getName());
+        });
+
+        thread1.start();
+        thread2.start();
+
+        try {
+            thread1.join();
+            thread2.join();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+    public double getAverageStudentAge() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<Student> students = studentRepository.findAll();
+
+        double averageAge = students.stream()
+                .mapToInt(Student::getAge)
+                .average()
+                .orElse(0.0); // По умолчанию 0, если нет студентов
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return averageAge;
+    }
+    public List<String> getStudentNamesStartingWithA() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        List<String> studentNamesStartingWithA = studentRepository.findAll()
+        .stream()
+                .filter(student -> student.getName().startsWith("A"))
+                .map(student -> student.getName().toUpperCase())
+                .sorted()
+                .collect(Collectors.toList());
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms service");
+
+        return studentNamesStartingWithA;
+    }
+    public int calculateSum() {
+        long startTime = System.currentTimeMillis(); // Засекаем время перед выполнением
+        int sum = Stream.iterate(1, a -> a + 1)
+                .limit(1_000_000)
+                .parallel()  // Включение параллельных вычислений
+                .reduce(0, (a, b) -> a + b);
+
+        long endTime = System.currentTimeMillis(); // Засекаем время после выполнения
+        long executionTime = endTime - startTime; // Вычисляем время выполнения в миллисекундах
+
+        System.out.println("Время выполнения: " + executionTime + " ms");
+
+        return sum;
     }
 
     public Student createStudent(Student student) {
